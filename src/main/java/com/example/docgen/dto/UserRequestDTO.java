@@ -32,6 +32,7 @@ public class UserRequestDTO {
 	private String phone;
 
 	
+	
 	private String cpf;
 	
 	

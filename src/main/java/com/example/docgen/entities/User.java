@@ -43,7 +43,7 @@ public class User implements Serializable, UserDetails {
 	private String cpf;
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private UserRole role;
+	private UserRole role = UserRole.USER;
 
 	public User() {
 	}

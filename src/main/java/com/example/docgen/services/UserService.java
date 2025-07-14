@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.docgen.dto.BatchUserInsertResponseDTO;
 import com.example.docgen.dto.FailedUserDTO;
-import com.example.docgen.dto.UserMapperDTO;
 import com.example.docgen.dto.UserRequestDTO;
 import com.example.docgen.dto.UserResponseDTO;
 import com.example.docgen.dto.UserUpdateDTO;
 import com.example.docgen.entities.User;
 import com.example.docgen.exceptions.CpfValidationException;
 import com.example.docgen.exceptions.ResourceNotFoundException;
+import com.example.docgen.mappers.UserMapper;
 import com.example.docgen.repositories.UserRepository;
 
 import br.com.caelum.stella.validation.CPFValidator;
@@ -29,11 +29,13 @@ public class UserService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final UserMapper userMapper;
 
 	// Injetando via construtor
-	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
 		this.passwordEncoder = passwordEncoder;
 		this.userRepository = userRepository;
+		this.userMapper = userMapper;
 	}
 
 	public List<User> findAll() {
@@ -54,7 +56,7 @@ public class UserService implements UserDetailsService {
 		validateUser(dto);
 		// Criptografia de senhas
 
-		User user = UserMapperDTO.toEntity(dto);
+		User user = userMapper.toEntity(dto);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 
 		return userRepository.save(user);
@@ -83,10 +85,10 @@ public class UserService implements UserDetailsService {
 			try {
 
 				validateUser(dto);
-				User user = UserMapperDTO.toEntity(dto); // Validação foi feita antes
+				User user = userMapper.toEntity(dto); // Validação foi feita antes
 				user.setPassword(passwordEncoder.encode(user.getPassword()));
 				User saved = userRepository.save(user);
-				successUsers.add(UserMapperDTO.toDto(saved));
+				successUsers.add(userMapper.toDto(saved));
 			} catch (Exception e) {
 				failedUsers.add(new FailedUserDTO(dto.getEmail(), e.getMessage()));
 			}
@@ -103,10 +105,14 @@ public class UserService implements UserDetailsService {
 			throw new DataIntegrityViolationException("Email já cadastrado: " + u.getEmail());
 		});
 
+		
+		// Sanitiza o CPF removendo tudo que não for dígito
+		String cleanCpf = userDTO.getCpf().replaceAll("[^\\d]", "");
+		
 		// Validação real do CPF com Stella
 		CPFValidator cpfValidator = new CPFValidator();
 		try {
-			cpfValidator.assertValid(userDTO.getCpf());
+			cpfValidator.assertValid(cleanCpf);
 		} catch (InvalidStateException e) {
 			throw new CpfValidationException("CPF inválido: " + userDTO.getCpf());
 		}
