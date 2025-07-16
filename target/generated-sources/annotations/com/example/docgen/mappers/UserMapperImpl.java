@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-14T18:22:33-0300",
+    date = "2025-07-16T17:58:22-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.41.0.v20250213-1140, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component
@@ -24,12 +24,12 @@ public class UserMapperImpl implements UserMapper {
 
         User user = new User();
 
-        user.setBirthDate( dto.getBirthDate() );
-        user.setCpf( dto.getCpf() );
-        user.setEmail( dto.getEmail() );
         user.setName( dto.getName() );
+        user.setEmail( dto.getEmail() );
         user.setPassword( dto.getPassword() );
+        user.setBirthDate( dto.getBirthDate() );
         user.setPhone( dto.getPhone() );
+        user.setCpf( dto.getCpf() );
 
         user.setRole( com.example.docgen.entities.enums.UserRole.USER );
 
@@ -46,9 +46,9 @@ public class UserMapperImpl implements UserMapper {
 
         UserResponseDTO userResponseDTO = new UserResponseDTO();
 
-        userResponseDTO.setEmail( user.getEmail() );
         userResponseDTO.setId( user.getId() );
         userResponseDTO.setName( user.getName() );
+        userResponseDTO.setEmail( user.getEmail() );
         userResponseDTO.setPhone( user.getPhone() );
         if ( user.getRole() != null ) {
             userResponseDTO.setRole( user.getRole().name() );

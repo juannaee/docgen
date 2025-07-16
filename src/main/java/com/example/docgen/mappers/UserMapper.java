@@ -21,6 +21,7 @@ public interface UserMapper {
 	@Mapping(target = "authorities", ignore = true)
 	User toEntity(UserRequestDTO dto);
 
+
 	UserResponseDTO toDto(User user);
 
 	List<UserResponseDTO> toDtoList(List<User> user);
